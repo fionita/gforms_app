@@ -1,0 +1,40 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="mb-6">
+    <%= link_to "← Back to Form", form_path(@form), class: "text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Responses for "<%= @form.title %>"</h1>
+        <p class="text-gray-600"><%= pluralize(@responses.count, 'response') %> received</p>
+      </div>
+      <%= link_to "Fill Form", new_form_response_path(@form), class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+    </div>
+
+    <% if @responses.any? %>
+      <div class="space-y-4">
+        <% @responses.each_with_index do |response, index| %>
+          <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="font-semibold text-gray-900">Response #<%= @responses.count - index %></h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Submitted <%= time_ago_in_words(response.created_at) %> ago
+                  <span class="text-gray-400">•</span>
+                  <%= response.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                </p>
+              </div>
+              <%= link_to "View Details", form_response_path(@form, response), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-12 bg-gray-50 rounded-lg">
+        <p class="text-gray-600 mb-4">No responses yet. Be the first to fill out this form!</p>
+        <%= link_to "Fill Form", new_form_response_path(@form), class: "inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+      </div>
+    <% end %>
+  </div>
+</div>

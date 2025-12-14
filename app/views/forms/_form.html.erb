@@ -1,0 +1,128 @@
+<%= form_with(model: form, class: "space-y-6", data: { controller: "form-fields" }) do |f| %>
+  <% if form.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+      <h2 class="font-bold mb-2"><%= pluralize(form.errors.count, "error") %> prohibited this form from being saved:</h2>
+      <ul class="list-disc list-inside">
+        <% form.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :title, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500", placeholder: "Enter form title" %>
+  </div>
+
+  <div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Form Fields</h3>
+    
+    <div data-form-fields-target="fields" class="space-y-4">
+      <%= f.fields_for :fields do |field_form| %>
+        <div class="field-group bg-gray-50 border border-gray-300 rounded-lg p-4">
+          <%= field_form.hidden_field :_destroy %>
+          <%= field_form.hidden_field :position %>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <%= field_form.label :field_type, "Field Type", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= field_form.select :field_type, 
+                  options_for_select([["Text Input", "input"], ["Number", "number"], ["Select", "select"]], field_form.object.field_type),
+                  {},
+                  class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
+                  data: { action: "change->form-fields#toggleOptions" } %>
+            </div>
+            
+            <div>
+              <%= field_form.label :label, "Field Label", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= field_form.text_field :label, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500", placeholder: "Enter field label" %>
+            </div>
+          </div>
+          
+          <div class="options-container <%= 'hidden' unless field_form.object.field_type == 'select' %>">
+            <%= field_form.label :options, "Options (one per line)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <% 
+              options_text = if field_form.object.options&.is_a?(Array)
+                field_form.object.options.map do |opt|
+                  if opt.is_a?(Hash)
+                    "#{opt['label'] || opt[:label]}|#{opt['value'] || opt[:value]}"
+                  else
+                    opt.to_s
+                  end
+                end.join("\n")
+              else
+                ""
+              end
+            %>
+            <%= field_form.text_area :options, 
+                value: options_text,
+                class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500",
+                placeholder: "Red|red\nGreen|green\nBlue|blue",
+                rows: 4 %>
+            <p class="text-xs text-gray-500 mt-1">Format: <code class="bg-gray-200 px-1 rounded">Label|value</code> or just <code class="bg-gray-200 px-1 rounded">Label</code> (one per line)</p>
+          </div>
+          
+          <button type="button" 
+                  data-action="click->form-fields#removeField"
+                  class="mt-3 text-sm text-red-600 hover:text-red-800 font-medium">
+            Remove Field
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <button type="button" 
+            data-action="click->form-fields#addField"
+            class="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+      Add Field
+    </button>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded cursor-pointer" %>
+    <%= link_to "Cancel", forms_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded" %>
+  </div>
+
+  <template data-form-fields-target="template">
+    <div class="field-group bg-gray-50 border border-gray-300 rounded-lg p-4">
+      <input type="hidden" name="form[fields_attributes][NEW_RECORD][position]" value="0">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Field Type</label>
+          <select name="form[fields_attributes][NEW_RECORD][field_type]" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  data-action="change->form-fields#toggleOptions">
+            <option value="input">Text Input</option>
+            <option value="number">Number</option>
+            <option value="select">Select</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Field Label</label>
+          <input type="text" 
+                 name="form[fields_attributes][NEW_RECORD][label]" 
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                 placeholder="Enter field label">
+        </div>
+      </div>
+      
+      <div class="options-container hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Options (one per line)</label>
+        <textarea name="form[fields_attributes][NEW_RECORD][options]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Red|red\nGreen|green\nBlue|blue"
+                  rows="4"></textarea>
+        <p class="text-xs text-gray-500 mt-1">Format: <code class="bg-gray-200 px-1 rounded">Label|value</code> or just <code class="bg-gray-200 px-1 rounded">Label</code> (one per line)</p>
+      </div>
+      
+      <button type="button"
+              data-action="click->form-fields#removeField"
+              class="mt-3 text-sm text-red-600 hover:text-red-800 font-medium">
+        Remove Field
+      </button>
+    </div>
+  </template>
+<% end %>

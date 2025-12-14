@@ -1,0 +1,37 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Forms</h1>
+    <%= link_to "New Form", new_form_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+  </div>
+
+  <% if @forms.any? %>
+    <div class="grid gap-4">
+      <% @forms.each do |form| %>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h2 class="text-xl font-semibold text-gray-900 mb-2"><%= form.title %></h2>
+              <p class="text-sm text-gray-600 mb-4">
+                <%= pluralize(form.fields.count, 'question') %>
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <%= link_to "View", form_path(form), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+              <%= link_to "Edit", edit_form_path(form), class: "text-green-600 hover:text-green-800 font-medium" %>
+              <%= button_to "Delete", form_path(form), method: :delete, form: { data: { turbo_confirm: "Are you sure?" } }, class: "text-red-600 hover:text-red-800 font-medium" %>
+            </div>
+          </div>
+          <div class="flex gap-3 mt-4">
+            <%= link_to "Fill Form", new_form_response_path(form), class: "text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 px-3 rounded" %>
+            <%= link_to "View Responses (#{form.responses.count})", form_responses_path(form), class: "text-sm bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 px-3 rounded" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12 bg-gray-50 rounded-lg">
+      <p class="text-gray-600 mb-4">No forms yet. Create your first form to get started!</p>
+      <%= link_to "Create Form", new_form_path, class: "inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded" %>
+    </div>
+  <% end %>
+</div>
