@@ -46,7 +46,9 @@
               options_text = if field_form.object.options&.is_a?(Array)
                 field_form.object.options.map do |opt|
                   if opt.is_a?(Hash)
-                    "#{opt['label'] || opt[:label]}|#{opt['value'] || opt[:value]}"
+                    label = opt['label'] || opt[:label]
+                    value = opt['value'] || opt[:value]
+                    value ? "#{label}|#{value}" : label.to_s
                   else
                     opt.to_s
                   end

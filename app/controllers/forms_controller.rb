@@ -64,14 +64,10 @@ class FormsController < ApplicationController
       next if field.field_type != "select" || field.options.blank?
 
       if field.options.is_a?(String)
-        # Parse options: each line should be "label|value" or just "label" (value=label)
         field.options = field.options.split("\n").map(&:strip).reject(&:blank?).map do |line|
-          parts = line.split("|").map(&:strip)
-          if parts.size == 2
-            { label: parts[0], value: parts[1] }
-          else
-            { label: line, value: nil }
-          end
+          label, value = line.split("|").map(&:strip)
+
+          { label: label, value: value }
         end
       end
     end

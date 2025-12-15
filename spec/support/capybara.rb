@@ -19,7 +19,7 @@ end
 Capybara.register_driver :headless_firefox do |app|
   options = Selenium::WebDriver::Firefox::Options.new
   options.add_argument("-headless")
-  
+
   # Firefox installed via snap - point to actual binary
   options.binary = "/snap/firefox/current/usr/lib/firefox/firefox"
 
@@ -32,12 +32,12 @@ def detect_browser_driver
   if system("which google-chrome > /dev/null 2>&1") || system("which chromium-browser > /dev/null 2>&1") || system("which chromium > /dev/null 2>&1")
     return :headless_chrome
   end
-  
+
   # Check for Firefox
   if system("which firefox > /dev/null 2>&1")
     return :headless_firefox
   end
-  
+
   # Default to Chrome (will fail with helpful error if not installed)
   :headless_chrome
 end
